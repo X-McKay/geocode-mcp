@@ -1,0 +1,9 @@
+{
+  "servers": {
+    "geocoding": {
+      "command": "uv",
+      "args": ["run","geocoding_server.py"],
+      "cwd": "${workspaceFolder}"
+    }
+  }
+}
