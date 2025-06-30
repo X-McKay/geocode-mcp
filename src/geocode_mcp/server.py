@@ -8,18 +8,18 @@ Uses OpenStreetMap Nominatim API (free, no API key required)
 
 import asyncio
 import json
-from typing import Any, Dict, List, Optional, Sequence
-import aiohttp
+from collections.abc import Sequence
+from typing import Any, cast
 from urllib.parse import quote
 
-from mcp.server.models import InitializationOptions
+import aiohttp
 import mcp.server.stdio
 import mcp.types as types
 from mcp.server import NotificationOptions, Server
-
+from mcp.server.models import InitializationOptions
 
 # Global HTTP session
-http_session: Optional[aiohttp.ClientSession] = None
+http_session: aiohttp.ClientSession | None = None
 
 # Create the server instance
 server = Server("geocoding-server")
@@ -30,32 +30,33 @@ async def get_http_session() -> aiohttp.ClientSession:
     global http_session
     if http_session is None:
         http_session = aiohttp.ClientSession()
-    return http_session
+    return cast(aiohttp.ClientSession, http_session)
 
 
-async def close_http_session():
+async def close_http_session() -> None:
     """Close the global HTTP session."""
     global http_session
-    if http_session:
-        await http_session.close()
-        http_session = None
+    if http_session is not None:
+        session = http_session  # Create a local reference
+        http_session = None  # Clear the global first
+        await session.close()  # type: ignore[possibly-unbound-attribute]
 
 
-async def geocode_location(location: str, limit: int = 1) -> Dict[str, Any]:
+async def geocode_location(location: str, limit: int = 1) -> dict[str, Any]:
     """Geocode a location using Nominatim API."""
     session = await get_http_session()
-    
+
     encoded_location = quote(location)
     url = f"https://nominatim.openstreetmap.org/search?format=json&q={encoded_location}&limit={limit}&addressdetails=1"
 
-    headers = {
-        'User-Agent': 'MCP-Geocoding-Tool/1.0 (Python)'
-    }
+    headers = {"User-Agent": "MCP-Geocoding-Tool/1.0 (Python)"}
 
     try:
         async with session.get(url, headers=headers) as response:
             if not response.ok:
-                raise Exception(f"Nominatim API error: {response.status} {response.reason}")
+                raise Exception(
+                    f"Nominatim API error: {response.status} {response.reason}"
+                )
 
             data = await response.json()
 
@@ -66,8 +67,8 @@ async def geocode_location(location: str, limit: int = 1) -> Dict[str, Any]:
                     "suggestions": [
                         "Try including more specific details (e.g., state, country)",
                         "Check spelling of the location name",
-                        "Use a more general location (e.g., city instead of specific address)"
-                    ]
+                        "Use a more general location (e.g., city instead of specific address)",
+                    ],
                 }
 
             results = []
@@ -84,23 +85,25 @@ async def geocode_location(location: str, limit: int = 1) -> Dict[str, Any]:
                         "south": float(item["boundingbox"][0]),
                         "north": float(item["boundingbox"][1]),
                         "west": float(item["boundingbox"][2]),
-                        "east": float(item["boundingbox"][3])
-                    }
+                        "east": float(item["boundingbox"][3]),
+                    },
                 }
                 results.append(result)
 
             return {
                 "query": location,
                 "results_count": len(results),
-                "coordinates": results
+                "coordinates": results,
             }
 
     except aiohttp.ClientError as error:
-        raise Exception(f"Network error: Unable to connect to geocoding service - {str(error)}")
+        raise Exception(
+            f"Network error: Unable to connect to geocoding service - {str(error)}"
+        ) from error
 
 
 @server.list_tools()
-async def handle_list_tools() -> List[types.Tool]:
+async def handle_list_tools() -> list[types.Tool]:
     """List available tools."""
     return [
         types.Tool(
@@ -141,25 +144,17 @@ async def handle_call_tool(
                 raise ValueError("Location parameter is required and cannot be empty")
 
             coordinates = await geocode_location(location, limit)
-            
+
             return [
-                types.TextContent(
-                    type="text", 
-                    text=json.dumps(coordinates, indent=2)
-                )
+                types.TextContent(type="text", text=json.dumps(coordinates, indent=2))
             ]
         except Exception as error:
-            return [
-                types.TextContent(
-                    type="text",
-                    text=f"Error: {str(error)}"
-                )
-            ]
+            return [types.TextContent(type="text", text=f"Error: {str(error)}")]
     else:
         raise ValueError(f"Unknown tool: {name}")
 
 
-async def main():
+async def main() -> None:
     """Main entry point for the server."""
     # Initialize options
     options = InitializationOptions(
@@ -170,7 +165,7 @@ async def main():
             experimental_capabilities={},
         ),
     )
-    
+
     try:
         async with mcp.server.stdio.stdio_server() as (read_stream, write_stream):
             await server.run(
@@ -182,5 +177,10 @@ async def main():
         await close_http_session()
 
 
-if __name__ == "__main__":
+def run_server() -> None:
+    """Synchronous entry point for the server."""
     asyncio.run(main())
+
+
+if __name__ == "__main__":
+    run_server()

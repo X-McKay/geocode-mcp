@@ -2,7 +2,7 @@
   "servers": {
     "geocoding": {
       "command": "uv",
-      "args": ["run","geocoding_server.py"],
+      "args": ["run","geocode-mcp-server"],
       "cwd": "${workspaceFolder}"
     }
   }

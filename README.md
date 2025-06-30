@@ -1,236 +1,181 @@
-# MCP Geocoding Tool (Python)
+# Geocode MCP Server
 
-A Model Context Protocol (MCP) server that provides geocoding functionality to convert city names and locations into latitude and longitude coordinates. Uses the free OpenStreetMap Nominatim API, so no API keys are required.
+A Model Context Protocol (MCP) server for producing latitude/longitude coordinates for cities and areas using the OpenStreetMap Nominatim API.
 
 ## Features
 
-- Convert city names, addresses, and locations to lat/lng coordinates
-- Support for multiple result limits (1-10 results)
-- Detailed location information including bounding boxes
-- No API key required (uses OpenStreetMap Nominatim)
-- Error handling with helpful suggestions
-- Pure Python implementation with async support
+- 🌍 **Geocoding**: Get coordinates for any location worldwide
+- 🆓 **Free API**: Uses OpenStreetMap Nominatim (no API key required)
+- 🛠️ **MCP Integration**: Works with Cursor, VSCode, and other MCP-compatible editors
+- 🧪 **Comprehensive Testing**: Full test suite with unit and integration tests
+- 📦 **Modern Tooling**: Ruff for linting, ty for type checking, pytest for testing
 
-## Installation
+## Quick Start
 
-### Prerequisites
-- Python 3.8+
-- pip
-
-### Setup
-
-1. Extract the zip file and navigate to the directory:
-```bash
-cd mcp-geocoding-server-python
-```
-
-2. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-Or install directly:
-```bash
-pip install mcp aiohttp
-```
-
-### Alternative: Install as Package
+### Installation
 
 ```bash
-pip install -e .
-```
+# Clone the repository
+git clone <repository-url>
+cd geocode-mcp
 
-## Usage
+# Install dependencies
+make install-dev
+```
 
 ### Running the Server
 
-Direct execution:
 ```bash
-python geocoding_server.py
+# Run the MCP server
+python scripts/run_mcp_server.py
+
+# Or make it executable and run directly
+chmod +x scripts/run_mcp_server.py
+./scripts/run_mcp_server.py
 ```
 
-Or if installed as a package:
+### Testing
+
 ```bash
-mcp-geocoding-server
+# Run all tests
+make test
+
+# Run with coverage
+make test-cov
+
+# Run specific test files
+pytest tests/test_geocoding.py -v
+python tests/test_mcp_server.py
 ```
 
-### Configuring with MCP Clients
+## Integration Guides
 
-Add this server to your MCP client configuration. For example, in Claude Desktop's configuration:
+- **[Cursor Integration](docs/cursor-integration.md)** - How to integrate with Cursor
+- **[VSCode Integration](tests/test_vscode.py)** - VSCode integration tests and setup
 
-```json
-{
-  "mcpServers": {
-    "geocoding": {
-      "command": "python",
-      "args": ["/path/to/your/mcp-geocoding-server-python/geocoding_server.py"]
-    }
-  }
-}
+## Project Structure
+
+```
+geocode-mcp/
+├── src/geocode/           # Main source code
+│   └── mcp_server.py     # MCP server implementation
+├── tests/                 # All test files
+│   ├── test_geocoding.py # Unit tests for geocoding
+│   ├── test_mcp.py       # Unit tests for MCP server
+│   ├── test_mcp_server.py # Integration tests
+│   └── test_vscode.py    # VSCode integration tests
+├── scripts/              # Executable scripts
+│   └── run_mcp_server.py # MCP server runner
+├── config/               # Configuration files
+│   └── cursor-mcp.json   # Cursor MCP configuration
+├── docs/                 # Documentation
+│   └── cursor-integration.md
+├── Makefile              # Development commands
+├── pyproject.toml        # Project configuration
+└── README.md            # This file
 ```
 
-Or if installed as a package:
+## Available Tools
 
-```json
-{
-  "mcpServers": {
-    "geocoding": {
-      "command": "mcp-geocoding-server"
-    }
-  }
-}
-```
-
-### Available Tools
-
-#### `get_coordinates`
-
-Gets latitude and longitude coordinates for a given location.
+### `get_coordinates`
+Get latitude and longitude coordinates for a city or location.
 
 **Parameters:**
-- `location` (string, required): City name, address, or location description
-- `limit` (number, optional): Maximum number of results to return (1-10, default: 1)
+- `location` (required): City name, address, or location
+- `limit` (optional): Maximum number of results (default: 1, max: 10)
 
 **Example Usage:**
-
-```python
-# Simple city lookup
-get_coordinates({
-    "location": "New York"
-})
-
-# More specific location
-get_coordinates({
-    "location": "Paris, France"
-})
-
-# Address lookup
-get_coordinates({
-    "location": "123 Main Street, Seattle, WA"
-})
-
-# Multiple results
-get_coordinates({
-    "location": "Springfield",
-    "limit": 5
-})
 ```
-
-**Example Response:**
-
-```json
-{
-  "query": "New York",
-  "results_count": 1,
-  "coordinates": [
-    {
-      "latitude": 40.7127281,
-      "longitude": -74.0060152,
-      "display_name": "New York, United States",
-      "place_id": 298085,
-      "type": "city",
-      "class": "place",
-      "importance": 0.9756419939577,
-      "bounding_box": {
-        "south": 40.4960439,
-        "north": 40.9152414,
-        "west": -74.2557349,
-        "east": -73.7000091
-      }
-    }
-  ]
-}
-```
-
-### Error Handling
-
-The tool provides helpful error messages and suggestions when locations cannot be found:
-
-```json
-{
-  "error": "No coordinates found for the specified location",
-  "query": "Nonexistent Place",
-  "suggestions": [
-    "Try including more specific details (e.g., state, country)",
-    "Check spelling of the location name",
-    "Use a more general location (e.g., city instead of specific address)"
-  ]
-}
+Get coordinates for Tokyo, Japan
+Find the latitude and longitude of London, UK
+What are the coordinates for New York City?
 ```
 
 ## Development
 
-### Project Structure
-
-```
-mcp-geocoding-server-python/
-├── geocoding_server.py    # Main MCP server implementation
-├── requirements.txt       # Python dependencies
-├── setup.py              # Package configuration
-└── README.md             # This file
-```
-
-### Running in Development Mode
+### Code Quality
 
 ```bash
-# Install in development mode
-pip install -e .
+# Lint code
+make lint
 
-# Run the server
-python geocoding_server.py
+# Format code
+make format
+
+# Type check
+make type-check
+
+# Run all checks
+make check-all
 ```
 
-## API Details
+### Testing
 
-This tool uses the OpenStreetMap Nominatim API:
-- **Service**: https://nominatim.openstreetmap.org/
-- **Rate Limits**: Please be respectful of the free service
-- **Attribution**: Data © OpenStreetMap contributors
+```bash
+# Run all tests
+make test
 
-## Dependencies
+# Run with coverage
+make test-cov
 
-- **mcp**: Model Context Protocol SDK for Python
-- **aiohttp**: Async HTTP client for making API requests
+# Run specific test categories
+pytest tests/test_geocoding.py -v  # Geocoding tests
+pytest tests/test_mcp.py -v        # MCP server tests
+python tests/test_mcp_server.py    # Integration tests
+python tests/test_vscode.py        # VSCode tests
+```
+
+### Installation
+
+```bash
+# Install production dependencies
+make install
+
+# Install development dependencies
+make install-dev
+```
+
+## Configuration
+
+### Cursor Integration
+See [Cursor Integration Guide](docs/cursor-integration.md) for detailed setup instructions.
+
+### VSCode Integration
+Run the VSCode integration tests:
+```bash
+python tests/test_vscode.py
+```
+
+## API Reference
+
+### Geocoding Function
+```python
+async def geocode_location(location: str, limit: int = 1) -> dict[str, Any]:
+    """Geocode a location using Nominatim API."""
+```
+
+### MCP Server
+The server provides the `get_coordinates` tool that can be called via the MCP protocol.
 
 ## Contributing
 
-Feel free to submit issues and enhancement requests!
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests: `make test`
+5. Run linting: `make lint`
+6. Submit a pull request
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for more details.
 
 ## License
 
-MIT License - feel free to use this in your own projects.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Notes
+## Acknowledgments
 
-- The tool includes a proper User-Agent header as required by Nominatim
-- Network errors are handled gracefully with async/await
-- Results include detailed information beyond just coordinates
-- Bounding boxes are provided for spatial applications
-- The importance score can help rank multiple results
-- Async implementation for better performance
-
-## Troubleshooting
-
-**"Network error: Unable to connect to geocoding service"**
-- Check your internet connection
-- Verify that nominatim.openstreetmap.org is accessible
-- Try again in a few moments (rate limiting)
-
-**"No coordinates found for the specified location"**
-- Check the spelling of your location
-- Try adding more specific details (state, country)
-- Use a more general location name
-
-**MCP Connection Issues**
-- Ensure Python 3.8+ is installed
-- Check that all dependencies are installed (`pip install -r requirements.txt`)
-- Verify the path in your MCP client config is correct
-- Try running the script directly to test for errors
-
-**Import Errors**
-- Make sure you have the `mcp` package installed: `pip install mcp`
-- Install aiohttp: `pip install aiohttp`
-- Check your Python version: `python --version` (should be 3.8+)
+- [OpenStreetMap](https://www.openstreetmap.org/) for providing the Nominatim geocoding service
+- [MCP](https://modelcontextprotocol.io/) for the protocol specification
 ```
 
 ---

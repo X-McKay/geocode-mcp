@@ -1,10 +1,111 @@
 [project]
 name = "geocode-mcp"
-version = "0.1.0"
-description = "Add your description here"
+version = "0.0.1"
+description = "MCP server for producing latitude/longitude coordinates for cities and areas using OpenStreetMap Nominatim API"
 readme = "README.md"
-requires-python = ">=3.13"
+license = {text="MIT"}
+requires-python = ">=3.12"
+authors = [
+    {name = "Al McKay", email = "aldmckay@gmail.com"},
+]
+keywords = ["mcp","coordinates", "latitude", "longitude", "openstreetmap"]
 dependencies = [
-    "aiohttp>=3.12.13",
-    "mcp>=1.10.1",
+    "aiohttp>=3.8.0",
+    "mcp>=1.0.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
+    "pytest-asyncio>=0.21.0",
+    "pytest-cov>=4.0.0",
+    "ruff>=0.1.0",
+    "ty>=0.0.1a12",
+    "pre-commit>=3.0.0",
+]
+
+[project.scripts]
+geocode-mcp-server = "geocode_mcp.server:run_server"
+
+[project.urls]
+Homepage = "https://github.com/X-McKay/geocode-mcp"
+Repository = "https://github.com/X-McKay/geocode-mcp"
+Issues = "https://github.com/X-McKay/geocode-mcp/issues"
+Documentation = "https://github.com/X-McKay/geocode-mcp#readme"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/geocode_mcp"]
+include = [
+    "src/geocode_mcp/server.py",
+    "README.md",
+    "LICENSE",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+exclude = [
+    ".git",
+    ".venv",
+    "__pycache__",
+    "build",
+    "dist",
+    "*.egg-info",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+]
+ignore = [
+    "E501",  # line too long, handled by black
+    "B008",  # do not perform function calls in argument defaults
+]
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+line-ending = "auto"
+skip-magic-trailing-comma = false
+
+[tool.ruff.lint.isort]
+known-first-party = ["geocode"]
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --strict-markers"
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+source = ["src"]
+omit = [
+    "*/tests/*",
+    "*/setup.py",
+    "*/conftest.py",
+    "src/geocode_mcp/__main__.py",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+    "pass",
+    "raise ImportError",
 ]
