@@ -7,6 +7,11 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write  # Required for trusted publishing
+      contents: read   # Required to checkout the repository
+    
     steps:
     - uses: actions/checkout@v4
     
@@ -19,6 +24,6 @@ jobs:
       run: uv build
     
     - name: Publish to PyPI
-      run: uv publish
-      env:
-        UV_PUBLISH_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        packages-dir: dist/
