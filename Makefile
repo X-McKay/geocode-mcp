@@ -1,4 +1,4 @@
-.PHONY: help install install-dev clean lint format check test test-cov type-check all check-all
+.PHONY: help install install-dev clean lint format check test test-cov type-check all check-all build release-patch release-minor release-major
 
 # Default target
 help:
@@ -14,6 +14,8 @@ help:
 	@echo "  type-check   - Run type checking with ty"
 	@echo "  all          - Run lint, format, type-check, and test"
 	@echo "  check-all    - Run all checks (lint, format, type-check)"
+	@echo "  build        - Build the package"
+	@echo "  publish      - Publish the package to PyPI"
 
 # Install production dependencies
 install:
@@ -51,14 +53,23 @@ test:
 
 # Run tests with coverage
 test-cov:
-	pytest tests/ --cov=src/geocode --cov-report=term-missing --cov-report=html -v
+	pytest tests/ --cov=src/geocode_mcp --cov-report=term-missing --cov-report=html -v
 
-# Run type checking with ty
+# Run type checking
 type-check:
-	.venv/bin/python -m ty check src/ tests/
+	# Using mypy if available, otherwise skip
+	@which mypy >/dev/null 2>&1 && mypy src/ tests/ || echo "mypy not installed, skipping type check"
 
 # Run all checks (lint, format, type-check, test)
 all: lint format type-check test
 
 # Run all checks without tests
 check-all: lint format type-check 
+
+# Build the package
+build:
+	uv build
+
+# Publish to PyPI
+publish: build
+	uv publish

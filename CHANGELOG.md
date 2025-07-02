@@ -7,21 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.2.0] - 2025-07-02
+
 ### Added
-- Comprehensive test suite with mocked API responses
-- GitHub Actions CI/CD pipeline
-- Pre-commit hooks for code quality
-- Development dependencies and configuration
-- Security policy documentation
-- Contributing guidelines
+- Configuration examples for Cursor, VS Code, and Claude Desktop
+- Comprehensive configuration guide in `config/README.md`
+- Updated integration documentation for all supported tools
+- PyPI package distribution support with `uvx` installation
+- Proper entry point script: `geocode-mcp`
 
 ### Changed
-- Updated project configuration to use pyproject.toml exclusively
-- Improved README with badges and better documentation
-- Enhanced error handling and validation
+- **BREAKING**: Tool name changed from `get_coordinates` to `mcp_geocoding_get_coordinates`
+- **BREAKING**: Package structure simplified - removed `/scripts/` directory
+- Entry point now uses `geocode-mcp` command for consistency
+- Updated all documentation to reflect modern installation via PyPI
+- Improved project structure documentation
+- Enhanced troubleshooting guides for all integrations
+- Updated Makefile to remove obsolete commands and fix package references
+- Cleaned up development dependencies and configuration
+
+### Removed
+- `/scripts/run_mcp_server.py` - replaced with proper entry point
+- Obsolete configuration examples with local file paths
+- Outdated documentation references
 
 ### Fixed
-- Consistent package naming across configuration files
+- Package name consistency across all configuration files
+- Entry point configuration in `pyproject.toml`
+- Documentation links and file references
+- Development setup instructions
 
 ## [0.1.0] - 2025-06-29
 
@@ -42,5 +56,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Configurable result limits (1-10)
 - Detailed response format with metadata
 
-[Unreleased]: https://github.com/[username]/geocode-mcp/compare/v0.1.0...HEAD
-[0.1.0]: https://github.com/[username]/geocode-mcp/releases/tag/v0.1.0
+[Unreleased]: https://github.com/X-McKay/geocode-mcp/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/X-McKay/geocode-mcp/compare/v0.1.0...v0.2.0
+[0.1.0]: https://github.com/X-McKay/geocode-mcp/releases/tag/v0.1.0

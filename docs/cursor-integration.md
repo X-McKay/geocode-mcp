@@ -2,58 +2,62 @@
 
 This guide explains how to integrate the Geocoding MCP Server with Cursor.
 
-## Quick Setup
+## Quick Setup (Recommended)
 
-### 1. Install Dependencies
+### 1. Install the Package
+The easiest way is to use the published package:
+
 ```bash
-make install-dev
+uvx geocode-mcp
+```
+
+### 2. Configure in Cursor
+
+Add this configuration to your Cursor MCP settings:
+
+```json
+{
+  "mcpServers": {
+    "geocoding": {
+      "command": "uvx",
+      "args": ["geocode-mcp"]
+    }
+  }
+}
+```
+
+You can copy this exact configuration from [`config/cursor-mcp.json`](../config/cursor-mcp.json).
+
+## Development Setup
+
+If you're developing or testing locally:
+
+### 1. Install Development Dependencies
+```bash
+# Clone and install
+git clone https://github.com/X-McKay/geocode-mcp.git
+cd geocode-mcp
+pip install -e ".[dev]"
 ```
 
 ### 2. Test the Server
 ```bash
-python tests/test_mcp_server.py
+pytest tests/test_mcp_server.py -v
 ```
 
-### 3. Configure in Cursor
+### 3. Configure for Local Development
 
-#### Option A: Using Cursor Settings UI
-1. Open Cursor Settings (`Ctrl+,`)
-2. Search for "MCP" or "Model Context Protocol"
-3. Add a new MCP server with these settings:
-   ```json
-   {
-     "name": "geocoding",
-     "command": "python",
-     "args": ["/path/to/geocode-mcp/scripts/run_mcp_server.py"],
-     "cwd": "/path/to/geocode-mcp"
-   }
-   ```
+Use this configuration for local development:
 
-#### Option B: Using Settings JSON
-1. Open Settings JSON (`Ctrl+Shift+P` → "Preferences: Open Settings (JSON)")
-2. Add this configuration:
-   ```json
-   {
-     "mcp.servers": {
-       "geocoding": {
-         "command": "python",
-         "args": ["/path/to/geocode-mcp/scripts/run_mcp_server.py"],
-         "cwd": "/path/to/geocode-mcp"
-       }
-     }
-   }
-   ```
-
-#### Option C: Using Configuration File
-You can also reference the example configuration in `config/cursor-mcp.json`:
 ```json
 {
   "mcpServers": {
     "geocoding": {
       "command": "python",
-      "args": ["-m", "geocode.mcp_server"],
+      "args": ["-m", "geocode_mcp.server"],
+      "cwd": "/path/to/geocode-mcp",
       "env": {
-        "PYTHONPATH": "${workspaceFolder}/src"
+        "PYTHONPATH": "/path/to/geocode-mcp/src"
       }
     }
   }
@@ -62,76 +66,81 @@ You can also reference the example configuration in `config/cursor-mcp.json`:
 
 ## Available Tools
 
-Once integrated, you can use these tools in Cursor:
+Once integrated, you can use this tool in Cursor:
 
-### `get_coordinates`
+### `mcp_geocoding_get_coordinates`
 Get latitude and longitude coordinates for a city or location.
 
 **Parameters:**
-- `location` (required): City name, address, or location (e.g., 'New York', 'Paris, France')
-- `limit` (optional): Maximum number of results (default: 1, max: 10)
+- `location` (required): City name, address, or location (e.g., 'New York', 'Paris, France', '123 Main St, Seattle')
+- `limit` (optional): Maximum number of results to return (default: 1, max: 10)
 
 **Example Usage:**
 ```
 Get coordinates for Tokyo, Japan
 Find the latitude and longitude of London, UK
 What are the coordinates for New York City?
+Get coordinates for "1600 Pennsylvania Avenue, Washington DC" with limit 3
 ```
+
+**Response includes:**
+- Latitude and longitude
+- Display name of the location
+- Place ID from OpenStreetMap
+- Location type and classification
+- Importance ranking
+- Bounding box coordinates
+
+## Configuration Methods
+
+### Method 1: Cursor Settings UI
+1. Open Cursor Settings (`Ctrl+,` or `Cmd+,`)
+2. Search for "MCP" 
+3. Add the geocoding server configuration
+
+### Method 2: Settings JSON
+1. Open Command Palette (`Ctrl+Shift+P` or `Cmd+Shift+P`)
+2. Type "Preferences: Open Settings (JSON)"
+3. Add the MCP server configuration to your settings
+
+### Method 3: Workspace Configuration
+Add the configuration to your workspace's `.cursor/settings.json` file.
 
 ## Testing the Integration
 
-1. **Restart Cursor** after adding the MCP server
-2. **Open a chat** in Cursor
-3. **Try these prompts:**
+1. **Restart Cursor** after adding the MCP server configuration
+2. **Open a chat** in Cursor  
+3. **Try these example prompts:**
    - "What are the coordinates for Paris, France?"
    - "Get the latitude and longitude of Tokyo"
-   - "Find coordinates for multiple cities: London, Berlin, and Rome"
+   - "Find coordinates for Seattle, Washington"
+   - "Get coordinates for multiple results: London with limit 3"
 
 ## Troubleshooting
 
 ### Server Won't Start
-- Ensure all dependencies are installed: `make install-dev`
-- Check Python path: `python scripts/run_mcp_server.py`
-- Verify the server script is executable: `chmod +x scripts/run_mcp_server.py`
+- **Check uvx installation**: `uvx --version`
+- **Verify package availability**: `uvx geocode-mcp --help`
+- **Check package installation**: `pip show geocode-mcp`
 
-### Tools Not Available
-- Restart Cursor after configuration
-- Check Cursor's MCP logs for errors
-- Verify the server is running: `python tests/test_mcp_server.py`
+### Tools Not Available in Cursor
+- **Restart Cursor** completely after configuration changes
+- **Check MCP server status** in Cursor's developer tools/logs
+- **Verify configuration syntax** - JSON must be valid
+- **Test locally**: `python -m geocode_mcp.server` (for development setup)
 
 ### Permission Issues
-- Make sure the script paths are absolute
-- Check file permissions on the Python script
-- Ensure the working directory is correct
+- On some systems, you may need to adjust file permissions
+- Try running: `chmod +x $(which geocode-mcp)` if using pip installation
 
-## Development
+### Development Issues
+- **Install in development mode**: `pip install -e ".[dev]"`
+- **Run tests**: `pytest tests/ -v`
+- **Check Python path**: Ensure `src/` is in PYTHONPATH for local development
 
-### Running Tests
-```bash
-make test
-```
+## Getting Help
 
-### Linting and Formatting
-```bash
-make lint
-make format
-```
-
-### Type Checking
-```bash
-make type-check
-```
-
-### All Checks
-```bash
-make check-all
-```
-
-## File Organization
-
-The project is organized as follows:
-- **`src/geocode/`** - Main source code
-- **`tests/`** - All test files
-- **`scripts/`** - Executable scripts
-- **`config/`** - Configuration files
-- **`docs/`** - Documentation 
+- Check the [main README](../README.md) for general usage
+- Review [configuration examples](../config/) for other tools
+- Open an issue on [GitHub](https://github.com/X-McKay/geocode-mcp/issues) if you encounter problems
+ 

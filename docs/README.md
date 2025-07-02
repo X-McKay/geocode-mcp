@@ -2,16 +2,22 @@
 
 This directory contains documentation for the geocode-mcp project.
 
-## Integration Guides
+## Available Documentation
 
-- **[Cursor Integration](cursor-integration.md)** - How to integrate with Cursor
-- **[VSCode Integration](vscode-integration.md)** - How to integrate with VSCode
+- **[Cursor Integration](cursor-integration.md)** - Complete guide for integrating with Cursor editor
 
-## Configuration Files
+## Configuration
 
-- **[MCP Configuration](mcp-config.md)** - MCP server configuration examples
+For configuration examples for different tools, see the [`config/`](../config/) directory:
+
+- **Cursor**: [`config/cursor-mcp.json`](../config/cursor-mcp.json)
+- **VS Code**: [`config/vscode-mcp.json`](../config/vscode-mcp.json)  
+- **Claude Desktop**: [`config/claude-desktop.json`](../config/claude-desktop.json)
 
 ## Development
 
-- **[Testing](testing.md)** - Testing guidelines and examples
-- **[Contributing](contributing.md)** - How to contribute to the project 
+For development information, see:
+
+- **[Main README](../README.md)** - Installation, usage, and development setup
+- **[Configuration Guide](../config/README.md)** - Detailed configuration instructions
+- **[Contributing Guidelines](../CONTRIBUTING.md)** - How to contribute to the project 

@@ -1,6 +1,6 @@
 [project]
 name = "geocode-mcp"
-version = "0.1.0"
+version = "0.2.0"
 description = "MCP server for producing latitude/longitude coordinates for cities and areas using OpenStreetMap Nominatim API"
 readme = "README.md"
 license = {text="MIT"}
@@ -30,7 +30,7 @@ dev = [
 ]
 
 [project.scripts]
-geocode-mcp-server = "geocode_mcp.server:run_server"
+geocode-mcp = "geocode_mcp.server:run_server"
 
 [project.urls]
 Homepage = "https://github.com/X-McKay/geocode-mcp"
