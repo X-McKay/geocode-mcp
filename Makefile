@@ -55,7 +55,7 @@ test-cov:
 
 # Run type checking with ty
 type-check:
-	ty check src/ tests/
+	.venv/bin/python -m ty check src/ tests/
 
 # Run all checks (lint, format, type-check, test)
 all: lint format type-check test

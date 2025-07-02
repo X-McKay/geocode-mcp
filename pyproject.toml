@@ -12,6 +12,7 @@ keywords = ["mcp","coordinates", "latitude", "longitude", "openstreetmap"]
 dependencies = [
     "aiohttp>=3.8.0",
     "mcp>=1.0.0",
+    "ty>=0.0.1a12",
 ]
 
 [build-system]

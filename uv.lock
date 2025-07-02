@@ -272,6 +272,7 @@ source = { editable = "." }
 dependencies = [
     { name = "aiohttp" },
     { name = "mcp" },
+    { name = "ty" },
 ]
 
 [package.optional-dependencies]
@@ -293,6 +294,7 @@ requires-dist = [
     { name = "pytest-asyncio", marker = "extra == 'dev'", specifier = ">=0.21.0" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=4.0.0" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.1.0" },
+    { name = "ty", specifier = ">=0.0.1a12" },
     { name = "ty", marker = "extra == 'dev'", specifier = ">=0.0.1a12" },
 ]
 provides-extras = ["dev"]
